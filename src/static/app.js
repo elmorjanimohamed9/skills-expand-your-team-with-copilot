@@ -305,7 +305,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Build reusable share content for an activity
-  function getShareContent(activityName, details) {
+  function buildActivityShareMessage(activityName, details) {
     const pageUrl = new URL(window.location.href);
     pageUrl.hash = `activity-${encodeURIComponent(activityName)}`;
 
@@ -320,8 +320,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Return a social share URL for supported platforms
-  function getPlatformShareUrl(platform, activityName, details) {
-    const shareContent = getShareContent(activityName, details);
+  function buildSharingLinkForPlatform(platform, activityName, details) {
+    const shareContent = buildActivityShareMessage(activityName, details);
 
     if (platform === "facebook") {
       return `https://www.facebook.com/sharer/sharer.php?u=${shareContent.encodedUrl}`;
@@ -341,7 +341,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Handle social sharing button clicks
-  async function handleShareActivity(event) {
+  async function onShareActivityButton(event) {
     const activityName = event.currentTarget.dataset.activity;
     const platform = event.currentTarget.dataset.platform;
     const activityDetails = allActivities[activityName];
@@ -353,7 +353,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (platform === "copy") {
       const shareUrl = decodeURIComponent(
-        getShareContent(activityName, activityDetails).encodedUrl
+        buildActivityShareMessage(activityName, activityDetails).encodedUrl
       );
 
       try {
@@ -366,7 +366,11 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const shareUrl = getPlatformShareUrl(platform, activityName, activityDetails);
+    const shareUrl = buildSharingLinkForPlatform(
+      platform,
+      activityName,
+      activityDetails
+    );
 
     if (!shareUrl) {
       showMessage("This sharing option is not available.", "error");
@@ -676,7 +680,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const shareButtons = activityCard.querySelectorAll(".share-button");
     shareButtons.forEach((button) => {
-      button.addEventListener("click", handleShareActivity);
+      button.addEventListener("click", onShareActivityButton);
     });
 
     activitiesList.appendChild(activityCard);
