@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const schoolName = "Mergington High School";
+  const schoolName =
+    document.querySelector("header h1")?.textContent?.trim() ||
+    "Mergington High School";
 
   // DOM elements
   const activitiesList = document.getElementById("activities-list");
@@ -307,7 +309,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Build reusable share content for an activity
-  function buildActivityShareMessage(activityName, details) {
+  function buildActivityShareContent(activityName, details) {
     const pageUrl = new URL(window.location.href);
     pageUrl.hash = `activity-${encodeURIComponent(activityName)}`;
 
@@ -322,8 +324,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Return a social share URL for supported platforms
-  function buildSharingLinkForPlatform(platform, activityName, details) {
-    const shareContent = buildActivityShareMessage(activityName, details);
+  function getShareUrl(platform, activityName, details) {
+    const shareContent = buildActivityShareContent(activityName, details);
 
     if (platform === "facebook") {
       return `https://www.facebook.com/sharer/sharer.php?u=${shareContent.encodedUrl}`;
@@ -355,7 +357,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (platform === "copy") {
       const shareUrl = decodeURIComponent(
-        buildActivityShareMessage(activityName, activityDetails).encodedUrl
+        buildActivityShareContent(activityName, activityDetails).encodedUrl
       );
 
       try {
@@ -368,11 +370,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const shareUrl = buildSharingLinkForPlatform(
-      platform,
-      activityName,
-      activityDetails
-    );
+    const shareUrl = getShareUrl(platform, activityName, activityDetails);
 
     if (!shareUrl) {
       showMessage("This sharing option is not available.", "error");
