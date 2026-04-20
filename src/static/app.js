@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const schoolName =
     document.querySelector("header h1")?.textContent?.trim() ||
-    "Mergington High School";
+    "Our School";
 
   // DOM elements
   const activitiesList = document.getElementById("activities-list");
@@ -549,6 +549,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderActivityCard(name, details) {
     const activityCard = document.createElement("div");
     activityCard.className = "activity-card";
+    activityCard.id = `activity-${encodeURIComponent(name)}`;
 
     // Calculate spots and capacity
     const totalSpots = details.max_participants;
