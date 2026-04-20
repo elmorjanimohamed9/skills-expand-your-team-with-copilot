@@ -429,11 +429,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Apply difficulty filter
       const difficultyLevel = details.difficulty_level;
+      const normalizedDifficultyLevel = (difficultyLevel || "").toLowerCase();
       if (currentDifficulty === "unspecified") {
         if (difficultyLevel) {
           return;
         }
-      } else if (difficultyLevel !== currentDifficulty) {
+      } else if (normalizedDifficultyLevel !== currentDifficulty) {
         return;
       }
 
