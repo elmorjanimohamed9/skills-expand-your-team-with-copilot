@@ -304,6 +304,78 @@ document.addEventListener("DOMContentLoaded", () => {
     return details.schedule;
   }
 
+  // Build reusable share content for an activity
+  function getShareContent(activityName, details) {
+    const pageUrl = new URL(window.location.href);
+    pageUrl.hash = `activity-${encodeURIComponent(activityName)}`;
+
+    const activitySchedule = formatSchedule(details);
+    const shareText = `Check out ${activityName} at Mergington High School! ${activitySchedule}`;
+
+    return {
+      text: shareText,
+      encodedText: encodeURIComponent(shareText),
+      encodedUrl: encodeURIComponent(pageUrl.toString()),
+    };
+  }
+
+  // Return a social share URL for supported platforms
+  function getPlatformShareUrl(platform, activityName, details) {
+    const shareContent = getShareContent(activityName, details);
+
+    if (platform === "facebook") {
+      return `https://www.facebook.com/sharer/sharer.php?u=${shareContent.encodedUrl}`;
+    }
+
+    if (platform === "x") {
+      return `https://twitter.com/intent/tweet?text=${shareContent.encodedText}&url=${shareContent.encodedUrl}`;
+    }
+
+    if (platform === "whatsapp") {
+      return `https://wa.me/?text=${encodeURIComponent(
+        `${shareContent.text} ${decodeURIComponent(shareContent.encodedUrl)}`
+      )}`;
+    }
+
+    return "";
+  }
+
+  // Handle social sharing button clicks
+  async function handleShareActivity(event) {
+    const activityName = event.currentTarget.dataset.activity;
+    const platform = event.currentTarget.dataset.platform;
+    const activityDetails = allActivities[activityName];
+
+    if (!activityDetails) {
+      showMessage("Unable to share this activity right now.", "error");
+      return;
+    }
+
+    if (platform === "copy") {
+      const shareUrl = decodeURIComponent(
+        getShareContent(activityName, activityDetails).encodedUrl
+      );
+
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        showMessage("Activity link copied. You can share it now!", "success");
+      } catch (error) {
+        console.error("Clipboard copy failed:", error);
+        showMessage("Couldn't copy the link. Please try again.", "error");
+      }
+      return;
+    }
+
+    const shareUrl = getPlatformShareUrl(platform, activityName, activityDetails);
+
+    if (!shareUrl) {
+      showMessage("This sharing option is not available.", "error");
+      return;
+    }
+
+    window.open(shareUrl, "_blank", "noopener,noreferrer");
+  }
+
   // Function to determine activity type (this would ideally come from backend)
   function getActivityType(activityName, description) {
     const name = activityName.toLowerCase();
@@ -569,6 +641,21 @@ document.addEventListener("DOMContentLoaded", () => {
         `
         }
       </div>
+      <div class="share-actions">
+        <span class="share-label">Share:</span>
+        <button class="share-button" data-platform="facebook" data-activity="${name}" type="button">
+          Facebook
+        </button>
+        <button class="share-button" data-platform="x" data-activity="${name}" type="button">
+          X
+        </button>
+        <button class="share-button" data-platform="whatsapp" data-activity="${name}" type="button">
+          WhatsApp
+        </button>
+        <button class="share-button share-copy-button" data-platform="copy" data-activity="${name}" type="button">
+          Copy Link
+        </button>
+      </div>
     `;
 
     // Add click handlers for delete buttons
@@ -586,6 +673,11 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
     }
+
+    const shareButtons = activityCard.querySelectorAll(".share-button");
+    shareButtons.forEach((button) => {
+      button.addEventListener("click", handleShareActivity);
+    });
 
     activitiesList.appendChild(activityCard);
   }
