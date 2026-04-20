@@ -1,4 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const schoolName = "Mergington High School";
+
   // DOM elements
   const activitiesList = document.getElementById("activities-list");
   const messageDiv = document.getElementById("message");
@@ -310,7 +312,7 @@ document.addEventListener("DOMContentLoaded", () => {
     pageUrl.hash = `activity-${encodeURIComponent(activityName)}`;
 
     const activitySchedule = formatSchedule(details);
-    const shareText = `Check out ${activityName} at Mergington High School! ${activitySchedule}`;
+    const shareText = `Check out ${activityName} at ${schoolName}! ${activitySchedule}`;
 
     return {
       text: shareText,
@@ -328,7 +330,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (platform === "x") {
-      return `https://twitter.com/intent/tweet?text=${shareContent.encodedText}&url=${shareContent.encodedUrl}`;
+      return `https://x.com/intent/tweet?text=${shareContent.encodedText}&url=${shareContent.encodedUrl}`;
     }
 
     if (platform === "whatsapp") {
