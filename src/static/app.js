@@ -114,13 +114,23 @@ document.addEventListener("DOMContentLoaded", () => {
         isDarkMode ? "Switch to light mode" : "Switch to dark mode"
       );
       themeToggleButton.setAttribute("aria-pressed", String(isDarkMode));
+      themeToggleButton.classList.remove("theme-toggle-pending");
     }
   }
 
   // Initialize saved theme preference
   function initializeTheme() {
     const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
-    applyTheme(savedTheme === "dark" ? "dark" : "light");
+
+    if (savedTheme === "dark" || savedTheme === "light") {
+      applyTheme(savedTheme);
+      return;
+    }
+
+    const prefersDarkMode =
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+    applyTheme(prefersDarkMode ? "dark" : "light");
   }
 
   // Check if user is already logged in (from localStorage)

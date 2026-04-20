@@ -680,6 +680,10 @@ footer {
   background-color: rgba(255, 255, 255, 0.3);
 }
 
+.theme-toggle-pending {
+  visibility: hidden;
+}
+
 .user-icon {
   font-size: 1rem;
 }
