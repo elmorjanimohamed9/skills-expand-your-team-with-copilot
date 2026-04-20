@@ -317,6 +317,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const shareText = `Check out ${activityName} at ${schoolName}! ${activitySchedule}`;
 
     return {
+      url: pageUrl.toString(),
       text: shareText,
       encodedText: encodeURIComponent(shareText),
       encodedUrl: encodeURIComponent(pageUrl.toString()),
@@ -324,9 +325,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Return a social share URL for supported platforms
-  function getShareUrl(platform, activityName, details) {
-    const shareContent = buildActivityShareContent(activityName, details);
-
+  function getShareUrl(platform, shareContent) {
     if (platform === "facebook") {
       return `https://www.facebook.com/sharer/sharer.php?u=${shareContent.encodedUrl}`;
     }
@@ -337,7 +336,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (platform === "whatsapp") {
       return `https://wa.me/?text=${encodeURIComponent(
-        `${shareContent.text} ${decodeURIComponent(shareContent.encodedUrl)}`
+        `${shareContent.text} ${shareContent.url}`
       )}`;
     }
 
@@ -355,13 +354,11 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    if (platform === "copy") {
-      const shareUrl = decodeURIComponent(
-        buildActivityShareContent(activityName, activityDetails).encodedUrl
-      );
+    const shareContent = buildActivityShareContent(activityName, activityDetails);
 
+    if (platform === "copy") {
       try {
-        await navigator.clipboard.writeText(shareUrl);
+        await navigator.clipboard.writeText(shareContent.url);
         showMessage("Activity link copied. You can share it now!", "success");
       } catch (error) {
         console.error("Clipboard copy failed:", error);
@@ -370,7 +367,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const shareUrl = getShareUrl(platform, activityName, activityDetails);
+    const shareUrl = getShareUrl(platform, shareContent);
 
     if (!shareUrl) {
       showMessage("This sharing option is not available.", "error");
